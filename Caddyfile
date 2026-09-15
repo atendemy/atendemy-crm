@@ -8,6 +8,36 @@
 {$DOMAIN} {
 	encode gzip
 
+	# ── AJUSTE LOCAL DESTA INSTALAÇÃO (crm.atendemy.com.br) ─────────────────
+	# NÃO faz parte do projeto. Se o `update.sh` parar dizendo "mudanças locais
+	# que divergem", é ESTA linha — e a mensagem é de propósito: sem ela o
+	# checkout traria o Caddyfile de fábrica, o ACME voltaria a falhar e o site
+	# cairia sem ninguém saber por quê.
+	#
+	# Por que `tls internal` em vez do Let's Encrypt de fábrica: este domínio
+	# está atrás do proxy da Cloudflare (nuvem laranja), e a zona DNS vive numa
+	# conta de parceiro da HostGator — sem acesso para desligar o proxy.
+	#
+	# MEDIDO nesta VPS em 2026-09-15, antes de instalar:
+	#   - http://crm…/  → 301 emitido pela BORDA da Cloudflare; a requisição
+	#     nunca chega aqui, então o desafio ACME HTTP-01 não pode ser servido;
+	#   - TLS-ALPN-01 também não: o Let's Encrypt só alcança a borda, não a origem;
+	#   - sonda com dois servidores (80 em claro, 443 com cert autoassinado):
+	#     a Cloudflare conectou na 443, ACEITOU o cert autoassinado e devolveu
+	#     HTTP 200 ao cliente → o modo dela é Full, não Full (strict).
+	#
+	# Logo: o visitante recebe o certificado VÁLIDO da Cloudflare, e o trecho
+	# Cloudflare→origem vai cifrado com o cert interno do Caddy. Deixar o ACME
+	# ligado só produziria falha em laço e queimaria o limite de tentativas do
+	# Let's Encrypt.
+	#
+	# PARA VOLTAR AO PADRÃO quando a nuvem ficar cinza (DNS only):
+	#   cd /root/deskcomm && git checkout Caddyfile
+	#   bash setup-kit/install.sh --yes
+	# O Caddy emite o certificado real do Let's Encrypt sozinho e esta
+	# dependência da configuração da Cloudflare desaparece.
+	tls internal
+
 	# `route` é obrigatório aqui: fora dele o Caddy reordena as diretivas pela
 	# ordem padrão dele, na qual `respond` vem DEPOIS de `reverse_proxy` — o
 	# catch-all atendia primeiro e o 403 abaixo nunca era alcançado (medido: o
