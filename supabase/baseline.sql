@@ -23276,6 +23276,46 @@ delete from public.channel_sessions
 
 notify pgrst,'reload schema';
 
+-- ---- search_path fixo e índice redundante (migration 0233) ----
+--
+-- ENTRA ANTES da varredura anon de propósito: aquele bloco é, por contrato, o
+-- último do arquivo (`tests/unit/varredura-anon-e-o-ultimo-bloco.test.ts`).
+-- Este aqui também precisa rodar DEPOIS de tudo que cria função — e roda, já
+-- que nada cria função entre os dois.
+--
+-- Auto-curativo porque tem de ser: o corpo deste arquivo traz 224
+-- `create or replace function`, e `create or replace` APAGA as cláusulas SET da
+-- função. Um `alter function ... set search_path` aplicado à mão no banco de
+-- quem hospeda é revertido, em silêncio, no primeiro `update.sh`. Só sobrevive
+-- o que for varrido aqui, a cada aplicação.
+--
+-- Racional completo e os avisos descartados com motivo: migration 0233.
+do $$
+declare
+  f record;
+begin
+  for f in
+    select p.oid::regprocedure as assinatura
+      from pg_proc p
+      join pg_namespace n on n.oid = p.pronamespace
+      left join pg_depend d on d.objid = p.oid and d.deptype = 'e'
+     where n.nspname = 'public'
+       and d.objid is null
+       and p.prokind in ('f', 'p')
+       and not exists (
+         select 1 from unnest(coalesce(p.proconfig, '{}')) c where c like 'search\_path=%'
+       )
+  loop
+    execute format('alter routine %s set search_path = public, pg_temp', f.assinatura);
+  end loop;
+end $$;
+
+-- O `create unique index if not exists ai_models_provider_model_unique` do
+-- corpo deste arquivo fica onde está: se o dump for regerado de um banco que
+-- já não o tem, ele desaparece de lá e este drop vira no-op. Cura nos dois
+-- sentidos; editar o dump só cobriria um.
+drop index if exists public.ai_models_provider_model_unique;
+
 -- ---- VARREDURA anon: função nova nasce exposta em quem ATUALIZA (migration 0116) ----
 --
 -- ⚠️ ESTE BLOCO É, DE PROPÓSITO, O ÚLTIMO DO ARQUIVO. Apêndice novo entra ANTES
