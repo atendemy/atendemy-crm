@@ -1,1 +1,2 @@
-Este é um arquivo de teste para validar a integração com o repositório AtendeMy.
+Este é o segundo arquivo de teste.
+Você pode commitar e enviar (Push) pelo seu editor agora mesmo para ver se tudo ocorre perfeitamente!
