@@ -106,15 +106,7 @@ export function ChatThread({ conversationId, onResponder }: Props) {
     paginasVistas.current = paginas;
     if (carregouAntigas) return;
 
-    // A guarda de distância NÃO vale na primeira carga: ali o scroller ainda
-    // está no topo por definição, e tratá-lo como "usuário lendo o histórico"
-    // abriria a conversa na mensagem mais antiga da página em vez da mais nova
-    // (medido: a thread abria em msg#15 em vez de msg#64).
-    if (!primeiraCarga) {
-      const sc = scrollerRef.current;
-      if (sc && sc.scrollHeight - sc.scrollTop - sc.clientHeight > 120) return;
-    }
-
+    // Sempre rola ao fim na carga e quando chega mensagem nova para nunca ficar escondida
     bottomRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
   }, [items.length, conversationId, paginas]);
 
