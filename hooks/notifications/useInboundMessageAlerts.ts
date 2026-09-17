@@ -59,20 +59,49 @@ async function contactNotifyBits(contactId: string): Promise<{ title: string; ic
   return { title, icon };
 }
 
-async function contactIdFromRow(
+interface ConversationAlertMeta {
+  contactId: string | null;
+  assignedToUserId: string | null;
+  botSilencedUntil: string | null;
+  status: string | null;
+}
+
+async function conversationAlertMetaFromRow(
   row: Record<string, unknown>,
   conversationId: string | null,
-): Promise<string | null> {
-  if (typeof row.contact_id === "string") return row.contact_id;
-  if (!conversationId) return null;
+): Promise<ConversationAlertMeta | null> {
+  const inlineContactId = typeof row.contact_id === "string" ? row.contact_id : null;
+  if (!conversationId) {
+    return inlineContactId
+      ? { contactId: inlineContactId, assignedToUserId: null, botSilencedUntil: null, status: null }
+      : null;
+  }
   const supabase = createClient();
   const { data } = await supabase
     .from("conversations")
-    .select("contact_id")
+    .select("contact_id, assigned_to_user_id, bot_silenced_until, status")
     .eq("id", conversationId)
     .maybeSingle();
-  const c = data as { contact_id?: string | null } | null;
-  return typeof c?.contact_id === "string" ? c.contact_id : null;
+  const c = data as {
+    contact_id?: string | null;
+    assigned_to_user_id?: string | null;
+    bot_silenced_until?: string | null;
+    status?: string | null;
+  } | null;
+  return {
+    contactId: typeof c?.contact_id === "string" ? c.contact_id : inlineContactId,
+    assignedToUserId: typeof c?.assigned_to_user_id === "string" ? c.assigned_to_user_id : null,
+    botSilencedUntil: typeof c?.bot_silenced_until === "string" ? c.bot_silenced_until : null,
+    status: typeof c?.status === "string" ? c.status : null,
+  };
+}
+
+function isHumanAttending(meta: ConversationAlertMeta | null): boolean {
+  if (!meta) return true;
+  if (meta.assignedToUserId) return true;
+  if (meta.botSilencedUntil) return true;
+  if (meta.status === "pending" || meta.status === "claimed") return true;
+  return false;
 }
 
 export function useInboundMessageAlerts(): void {
@@ -100,7 +129,12 @@ export function useInboundMessageAlerts(): void {
       return;
     }
     void (async () => {
-      const contactId = await contactIdFromRow(row, conversationId);
+      const meta = await conversationAlertMetaFromRow(row, conversationId);
+      // IA conversando de forma autônoma: não apita nem incomoda o atendente
+      if (!isHumanAttending(meta)) {
+        return;
+      }
+      const contactId = meta?.contactId ?? null;
       const bits = contactId
         ? await contactNotifyBits(contactId)
         : { title: "Nova mensagem" as const, icon: undefined };

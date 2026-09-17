@@ -35,4 +35,12 @@ describe("shouldNotifyInbound", () => {
   it("pula sem conversationId", () => {
     expect(shouldNotifyInbound({ ...base, conversationId: null })).toBe(false);
   });
+
+  it("pula quando a IA está atendendo de forma autônoma (atendimentoHumano = false)", () => {
+    expect(shouldNotifyInbound({ ...base, atendimentoHumano: false })).toBe(false);
+  });
+
+  it("emite quando o atendimento é humano (atendimentoHumano = true)", () => {
+    expect(shouldNotifyInbound({ ...base, atendimentoHumano: true })).toBe(true);
+  });
 });

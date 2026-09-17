@@ -38,13 +38,22 @@ function absUrl(path: string): string {
  */
 export function emitNotification(input: EmitNotificationInput): void {
   if (typeof window === "undefined") return;
+
+  const spec = NOTIFY_KINDS[input.kind];
+  const sound = input.sound ?? spec.sound;
+
+  // Som toca mesmo com a aba oculta (segundo plano / minimizado) ou sem permissão de bandeja
+  try {
+    playSound(sound, 1.0);
+  } catch {
+    // AudioContext recusado ou indisponível
+  }
+
   const perm = getPermission();
   const enabled = areAlertsEnabled();
   if (!input.force && !enabled) return;
   if (perm !== "granted") return;
 
-  const spec = NOTIFY_KINDS[input.kind];
-  const sound = input.sound ?? spec.sound;
   const body = truncateNotifyBody(input.body);
   const tag = input.tag ? `${spec.tagPrefix}:${input.tag}` : `${spec.tagPrefix}:${Date.now()}`;
   const marca = absUrl("/icon");
@@ -59,14 +68,6 @@ export function emitNotification(input: EmitNotificationInput): void {
     badge: marca,
     data: { href },
   };
-
-  if (typeof document !== "undefined" && document.visibilityState === "visible") {
-    try {
-      playSound(sound, 1.0);
-    } catch {
-      // AudioContext recusa
-    }
-  }
 
   try {
     const n = new Notification(input.title, opts);

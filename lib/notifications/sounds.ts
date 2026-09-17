@@ -2,10 +2,10 @@ export const SOUND_IDS = ["message", "attention", "success", "failure", "silent"
 
 export type SoundId = (typeof SOUND_IDS)[number];
 
-/** Pico relativo 0–1. 1 = volume atual do beep (~0.08 de gain). */
+/** Pico relativo 0–1. 1 = volume atual do beep (~0.30 de gain). */
 export const SOUND_VOLUME = 1;
 
-const PICO = 0.08;
+const PICO = 0.3;
 
 let ctx: AudioContext | null = null;
 
@@ -21,6 +21,15 @@ function getContext(): AudioContext | null {
 export async function resumeAudio(): Promise<void> {
   const audio = getContext();
   if (audio && audio.state === "suspended") await audio.resume();
+}
+
+if (typeof window !== "undefined") {
+  const unlock = () => {
+    void resumeAudio();
+  };
+  window.addEventListener("click", unlock, { capture: true, passive: true });
+  window.addEventListener("touchstart", unlock, { capture: true, passive: true });
+  window.addEventListener("keydown", unlock, { capture: true, passive: true });
 }
 
 function beep(
