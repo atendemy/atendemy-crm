@@ -1,2 +1,0 @@
-Este é o segundo arquivo de teste.
-Você pode commitar e enviar (Push) pelo seu editor agora mesmo para ver se tudo ocorre perfeitamente!
