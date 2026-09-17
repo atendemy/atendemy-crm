@@ -82,6 +82,7 @@ export function ChatThread({ conversationId, onResponder }: Props) {
   );
 
   const paginas = q.data?.pages.length ?? 0;
+  const lastItemId = items[items.length - 1]?.data.id ?? "";
 
   // Conversa nova: a contagem de páginas recomeça, senão a primeira carga da
   // próxima conversa seria confundida com um "carregar mais antigas".
@@ -91,24 +92,34 @@ export function ChatThread({ conversationId, onResponder }: Props) {
 
   // Rola ao fim na primeira carga e quando chega mensagem/nota nova — mas NÃO
   // quando o crescimento veio do "Carregar mais antigas".
-  //
-  // A thread pagina para o PASSADO: cada `fetchNextPage` traz mensagens mais
-  // antigas, que entram ACIMA das que já estão na tela. Rolar ao fim aqui
-  // devolveria o usuário ao rodapé no instante em que ele pediu para subir —
-  // o clique parece não ter efeito, embora tenha carregado (medido: thread vai
-  // de msg#15..#64 para msg#1..#64 e a viewport volta a 7px do fim).
-  //
-  // A segunda guarda cobre o outro caso: se o usuário rolou para ler o
-  // histórico, mensagem nova não deve arrancá-lo de onde estava.
   useEffect(() => {
     const primeiraCarga = paginasVistas.current === 0;
     const carregouAntigas = !primeiraCarga && paginas > paginasVistas.current;
     paginasVistas.current = paginas;
     if (carregouAntigas) return;
 
-    // Sempre rola ao fim na carga e quando chega mensagem nova para nunca ficar escondida
-    bottomRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
-  }, [items.length, conversationId, paginas]);
+    // Rola forçadamente e com garantia para o final, para nunca deixar mensagem nova oculta
+    const scrollToEnd = () => {
+      const sc = scrollerRef.current;
+      if (sc) {
+        sc.scrollTop = sc.scrollHeight;
+      }
+      bottomRef.current?.scrollIntoView({ behavior: "auto", block: "end" });
+    };
+
+    scrollToEnd();
+    const rafId = requestAnimationFrame(scrollToEnd);
+    const t1 = setTimeout(scrollToEnd, 50);
+    const t2 = setTimeout(scrollToEnd, 150);
+    const t3 = setTimeout(scrollToEnd, 300);
+
+    return () => {
+      cancelAnimationFrame(rafId);
+      clearTimeout(t1);
+      clearTimeout(t2);
+      clearTimeout(t3);
+    };
+  }, [items.length, conversationId, paginas, lastItemId]);
 
   /**
    * O ESTADO DO CANAL DESTE THREAD, PUBLICADO SEMPRE — inclusive quando não há
@@ -249,7 +260,7 @@ export function ChatThread({ conversationId, onResponder }: Props) {
           </div>
         ))}
 
-        <div ref={bottomRef} />
+        <div ref={bottomRef} className="h-8 shrink-0" aria-hidden="true" />
       </div>
     </div>
   );
