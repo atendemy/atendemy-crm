@@ -8,6 +8,12 @@ Se você roda o DeskcommCRM numa VPS, **leia a seção da versão para a qual es
 
 ## [Não lançado]
 
+## [1.28.1] — 2026-09-17
+
+### Corrigido
+
+- **Exibição da razão registrada ao suspender um tenant** Ao suspender um tenant informando um motivo, a tela de detalhes exibia "Sem razão registrada." porque a consulta da API omitia a coluna e a tela não a repassava ao banner. A consulta e o componente passam a buscar e exibir a razão registrada.
+
 ## [1.28.0] — 2026-09-16
 
 ### Adicionado
@@ -4769,7 +4775,8 @@ Primeira versão marcada do DeskcommCRM. O projeto vinha sendo desenvolvido publ
 
 - **Node 22 é obrigatório para desenvolvimento.** A suíte de invariantes instancia o cliente do Supabase, que exige o `WebSocket` global — nativo apenas a partir do Node 22. Isso não afeta quem apenas hospeda: a VPS roda a imagem pronta.
 
-[Não lançado]: https://github.com/melgarafael/DeskcommCRM/compare/v1.28.0...HEAD
+[Não lançado]: https://github.com/melgarafael/DeskcommCRM/compare/v1.28.1...HEAD
+[1.28.1]: https://github.com/melgarafael/DeskcommCRM/compare/v1.28.0...v1.28.1
 [1.28.0]: https://github.com/melgarafael/DeskcommCRM/compare/v1.27.3...v1.28.0
 [1.27.3]: https://github.com/melgarafael/DeskcommCRM/compare/v1.27.2...v1.27.3
 [1.27.2]: https://github.com/melgarafael/DeskcommCRM/compare/v1.27.1...v1.27.2
