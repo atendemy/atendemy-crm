@@ -4,7 +4,7 @@ import { useT } from "@/hooks/i18n/useT";
 
 interface SuspendedBannerProps {
   suspendedAt: string;
-  reason?: string;
+  reason?: string | null;
 }
 
 function formatRelativePtBr(
@@ -44,7 +44,7 @@ export function SuspendedBanner({ suspendedAt, reason }: SuspendedBannerProps) {
         <span className="font-semibold">{t("Tenant suspenso")}</span>{" "}
         {formatRelativePtBr(suspendedAt, t)}.{" "}
         <span className="text-amber-800 dark:text-amber-300">
-          {reason ?? t("Sem razão registrada.")}
+          {reason?.trim() ? reason : t("Sem razão registrada.")}
         </span>
       </p>
     </div>

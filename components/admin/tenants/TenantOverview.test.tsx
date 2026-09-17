@@ -48,6 +48,7 @@ const ORG: TenantOrganization = {
   status: "active",
   onboarded_at: "2026-01-02T12:00:00.000Z",
   suspended_at: null,
+  suspended_reason: null,
   created_at: "2026-01-01T12:00:00.000Z",
   settings: { plan: "pro" },
 };
@@ -144,5 +145,22 @@ describe("TenantOverview — status da Nuvemshop", () => {
     expect(badge).toHaveTextContent("quota_exceeded");
     expect(STATUS_NO_BANCO).not.toContain("quota_exceeded");
     expect(badge.className).not.toBe(classeDaVariante("success"));
+  });
+
+  it("exibe motivo da suspensão no card de informações quando suspenso", () => {
+    const { container } = render(
+      <TenantOverview
+        organization={{
+          ...ORG,
+          status: "suspended",
+          suspended_at: "2026-09-16T18:00:00Z",
+          suspended_reason: "pagamento atrasado",
+        }}
+        counts={COUNTS}
+        integrations={{ nuvemshop_status: null, nuvemshop_connected_at: null }}
+      />,
+    );
+    expect(container).toHaveTextContent("Motivo da suspensão");
+    expect(container).toHaveTextContent("pagamento atrasado");
   });
 });

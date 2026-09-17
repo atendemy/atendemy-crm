@@ -124,6 +124,9 @@ export function TenantOverview({ organization, counts, integrations }: TenantOve
           {organization.suspended_at && (
             <InfoRow label={t("Suspenso em")} value={formatDate(organization.suspended_at, tagDoIdioma)} />
           )}
+          {organization.suspended_reason && (
+            <InfoRow label={t("Motivo da suspensão")} value={organization.suspended_reason} />
+          )}
         </div>
       </div>
 

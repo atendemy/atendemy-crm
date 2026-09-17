@@ -121,4 +121,44 @@ describe("GET /api/v1/admin/tenants/[id]", () => {
     };
     expect(body.data.counts.lgpd_requests_pending).toBe(2);
   });
+
+  it("consulta e devolve suspended_reason do tenant", async () => {
+    let selectColumns = "";
+    const orgSuspensa = {
+      ...ORG,
+      status: "suspended",
+      suspended_at: "2026-09-16T18:00:00Z",
+      suspended_reason: "pagamento atrasado",
+    };
+
+    vi.mocked(createAdminClient).mockReturnValue({
+      from: (table: string) => {
+        if (table === "organizations") {
+          const b: Record<string, unknown> = {};
+          b.select = (cols: string) => {
+            selectColumns = cols;
+            return b;
+          };
+          b.eq = () => b;
+          b.single = async () => ({ data: orgSuspensa, error: null });
+          return b;
+        }
+        return table === "lgpd_requests" ? lgpdBuilder() : contadorVazio();
+      },
+    } as never);
+
+    const { GET } = await import("./route");
+    const res = await GET(
+      new NextRequest(`http://localhost/api/v1/admin/tenants/${ORG_ID}`),
+      { params: Promise.resolve({ id: ORG_ID }) },
+    );
+    expect(res.status).toBe(200);
+    expect(selectColumns).toContain("suspended_reason");
+
+    const body = (await res.json()) as {
+      data: { organization: { status: string; suspended_reason: string } };
+    };
+    expect(body.data.organization.status).toBe("suspended");
+    expect(body.data.organization.suspended_reason).toBe("pagamento atrasado");
+  });
 });
