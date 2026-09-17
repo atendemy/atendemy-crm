@@ -14,6 +14,7 @@ import type { Lead } from "@/lib/types/leads";
 import type { Pipeline, Stage } from "@/lib/kanban/types";
 import { StageColumn } from "./StageColumn";
 import { LeadDossier } from "./LeadDossier";
+import { LoseLeadDialog } from "./LoseLeadDialog";
 import { camposDoFunil } from "@/lib/leads/campos-do-funil";
 
 interface KanbanBoardProps {
@@ -130,6 +131,7 @@ export function KanbanBoard({
     () => (selectedIds ? new Set(selectedIds) : internalSelected),
     [selectedIds, internalSelected],
   );
+  const [lostLeadId, setLostLeadId] = useState<string | null>(null);
 
   const data = useExternal
     ? {
@@ -193,6 +195,12 @@ export function KanbanBoard({
       const destList = (grouped.get(destStageId) ?? []).filter(
         (l) => l.id !== draggableId,
       );
+
+      const destStage = data.stages.find((s) => s.id === destStageId);
+      if (destStage?.is_lost) {
+        setLostLeadId(lead.id);
+        return;
+      }
 
       const before = destination.index > 0 ? destList[destination.index - 1] : null;
       const after =
@@ -274,6 +282,14 @@ export function KanbanBoard({
             data.stages.find((s) => s.id === leadDoDossie.stage_id)?.name ?? "—"
           }
           ownerNames={ownerNames}
+        />
+      )}
+      {lostLeadId && (
+        <LoseLeadDialog
+          open={true}
+          onOpenChange={(v) => !v && setLostLeadId(null)}
+          leadId={lostLeadId}
+          pipelineId={pipelineId}
         />
       )}
     </DragDropContext>
