@@ -90,6 +90,20 @@ export function ChatThread({ conversationId, onResponder }: Props) {
     paginasVistas.current = 0;
   }, [conversationId]);
 
+  // Observa inserções no DOM para rolar automaticamente ao final sem atraso
+  useEffect(() => {
+    const sc = scrollerRef.current;
+    if (!sc) return;
+
+    const observer = new MutationObserver(() => {
+      sc.scrollTop = sc.scrollHeight;
+    });
+
+    observer.observe(sc, { childList: true, subtree: true });
+
+    return () => observer.disconnect();
+  }, [conversationId]);
+
   // Rola ao fim na primeira carga e quando chega mensagem/nota nova — mas NÃO
   // quando o crescimento veio do "Carregar mais antigas".
   useEffect(() => {
@@ -104,20 +118,21 @@ export function ChatThread({ conversationId, onResponder }: Props) {
       if (sc) {
         sc.scrollTop = sc.scrollHeight;
       }
-      bottomRef.current?.scrollIntoView({ behavior: "auto", block: "end" });
     };
 
     scrollToEnd();
     const rafId = requestAnimationFrame(scrollToEnd);
-    const t1 = setTimeout(scrollToEnd, 50);
-    const t2 = setTimeout(scrollToEnd, 150);
-    const t3 = setTimeout(scrollToEnd, 300);
+    const t1 = setTimeout(scrollToEnd, 40);
+    const t2 = setTimeout(scrollToEnd, 100);
+    const t3 = setTimeout(scrollToEnd, 250);
+    const t4 = setTimeout(scrollToEnd, 500);
 
     return () => {
       cancelAnimationFrame(rafId);
       clearTimeout(t1);
       clearTimeout(t2);
       clearTimeout(t3);
+      clearTimeout(t4);
     };
   }, [items.length, conversationId, paginas, lastItemId]);
 
@@ -205,7 +220,11 @@ export function ChatThread({ conversationId, onResponder }: Props) {
 
   return (
     <div {...sinalDoCanal} className="flex h-full flex-col">
-      <div ref={scrollerRef} className="flex-1 overflow-y-auto py-2">
+      <div
+        ref={scrollerRef}
+        style={{ overflowAnchor: "none" }}
+        className="flex-1 overflow-y-auto py-2 [overflow-anchor:none]"
+      >
         {q.hasNextPage && (
           <div className="flex justify-center py-2">
             <Button
