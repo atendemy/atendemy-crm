@@ -118,10 +118,7 @@ export function SidebarContent({
   return (
     <>
       <div
-        className={cn(
-          "flex h-14 items-center border-b px-4",
-          collapsed ? "justify-center" : "justify-start",
-        )}
+        className="flex h-14 items-center justify-center border-b px-4"
       >
         {logo && !collapsed ? (
           // A moldura clara vale SÓ para o logo enviado por quem hospeda. A arte
