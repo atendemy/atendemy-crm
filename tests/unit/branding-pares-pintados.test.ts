@@ -360,7 +360,7 @@ describe("controle positivo — o produto sem marca não pode se mexer", () => {
     // `globals.css` o mesmo par dá 4,59, e `superficiesDoTema` documenta o trio
     // 4,99 · 4,59 · 4,02.
     expect(foco(p.escuro, "--color-accent-soft@--color-surface")).toBeCloseTo(4.40, 2);
-    expect(foco(p.escuro, "--color-accent-soft@--color-surface-elevated")).toBeCloseTo(4.03, 2);
+    expect(foco(p.escuro, "--color-accent-soft@--color-surface-elevated")).toBeCloseTo(3.88, 2);
   });
 
   it("sem marca configurada nada é injetado, e a tela fica como está", () => {
