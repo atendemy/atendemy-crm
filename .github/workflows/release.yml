@@ -16,7 +16,7 @@ name: release
 # quando um cliente tentasse atualizar.
 #
 # Por isso o ato 2 não confia: ele espera a publicação e CONFERE as três imagens
-# no registro, falhando alto se não apareceremm.
+# no registro, falhando alto se não aparecerem.
 
 on:
   workflow_dispatch: {}
