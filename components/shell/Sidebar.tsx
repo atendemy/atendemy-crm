@@ -272,7 +272,7 @@ export function SidebarContent({
                         case "ia": iconColorClass = "text-cyan-500/70 group-hover:text-cyan-400"; break;
                         case "canais": iconColorClass = "text-orange-500/70 group-hover:text-orange-400"; break;
                         case "analise": iconColorClass = "text-pink-500/70 group-hover:text-pink-400"; break;
-                        case "organizacao": iconColorClass = "text-neutral-500/70 group-hover:text-neutral-400"; break;
+                        case "organizacao": iconColorClass = "text-neutral-400 group-hover:text-neutral-300"; break;
                       }
                     }
 

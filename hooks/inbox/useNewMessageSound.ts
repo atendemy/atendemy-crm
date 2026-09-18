@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useRef } from "react";
 import { useRealtimeChannel } from "@/hooks/realtime/useRealtimeChannel";
+import { getContext } from "@/lib/notifications/sounds";
 
 export function useNewMessageSound(orgId: string | null) {
   // Guarda o last_inbound_at mais recente para evitar tocar som em load inicial
@@ -24,16 +25,17 @@ export function useNewMessageSound(orgId: string | null) {
       
       if (!newInboundAt) return;
 
-      // Se a última mensagem chegou há menos de 10 segundos, significa que é nova.
-      // E evitamos tocar para mensagens velhas no primeiro carregamento do canal.
-      const msAge = Date.now() - new Date(newInboundAt).getTime();
+      const last = lastInboundRef.current[convId];
+      if (last === newInboundAt) return; // Só tocamos se a data for realmente nova
+      lastInboundRef.current[convId] = newInboundAt;
       
-      // Toca o som apenas se a mensagem for realmente recente (menos de 5s) e o count for > 0
-      if (msAge < 5000 && payload.new.unread_count_for_assignee > 0) {
-        // Tocar som suave de nova mensagem (usando Oscillator igual IncomingCallBanner)
-        const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
-        if (AudioCtx) {
-          const ctx = new AudioCtx();
+      // Toca o som apenas se o count for > 0 (há mensagens não lidas para este atendente)
+      // Não validamos msAge porque o evento do Supabase Realtime só dispara quando o UPDATE de fato ocorre.
+      // Se houvesse drift no relógio do PC, a checagem msAge < 5s poderia bloquear a primeira notificação (falso negativo).
+      if (payload.new.unread_count_for_assignee > 0) {
+        const ctx = getContext();
+        if (ctx) {
+          void ctx.resume();
           const osc = ctx.createOscillator();
           const gain = ctx.createGain();
           

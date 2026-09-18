@@ -30,7 +30,12 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 describe("contador em memória", () => {
+  const originalUrl = process.env.UPSTASH_REDIS_REST_URL;
+  const originalToken = process.env.UPSTASH_REDIS_REST_TOKEN;
+
   beforeEach(() => {
+    delete process.env.UPSTASH_REDIS_REST_URL;
+    delete process.env.UPSTASH_REDIS_REST_TOKEN;
     vi.resetModules();
     vi.useFakeTimers();
     vi.setSystemTime(new Date("2026-08-10T12:00:00Z"));
@@ -38,6 +43,8 @@ describe("contador em memória", () => {
 
   afterEach(() => {
     vi.useRealTimers();
+    if (originalUrl !== undefined) process.env.UPSTASH_REDIS_REST_URL = originalUrl;
+    if (originalToken !== undefined) process.env.UPSTASH_REDIS_REST_TOKEN = originalToken;
   });
 
   it("não acumula uma chave por janela vencida", async () => {

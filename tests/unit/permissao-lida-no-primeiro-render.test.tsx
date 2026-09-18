@@ -138,17 +138,21 @@ describe("a permissão do navegador é lida no primeiro render", () => {
      * não depende de inscrição. Desabilitar trocaria prometer demais por
      * entregar de menos, e o segundo não deixa rastro.
      */
-    expect(
-      process.env.VAPID_PUBLIC_KEY ?? "",
-      "controle: este caso só significa algo sem VAPID no ambiente",
-    ).toBe("");
+    const oldVapid = process.env.VAPID_PUBLIC_KEY;
+    delete process.env.VAPID_PUBLIC_KEY;
 
-    comPermissaoDoNavegador("granted");
-    const markup = await markupSemEfeitos();
-    expect(
-      pushDesabilitado(markup).some(Boolean),
-      "sem VAPID o Push nasceu desabilitado — é o conserto exagerado, que tira " +
-        "o aviso com a aba aberta junto",
-    ).toBe(false);
+    try {
+      comPermissaoDoNavegador("granted");
+      const markup = await markupSemEfeitos();
+      expect(
+        pushDesabilitado(markup).some(Boolean),
+        "sem VAPID o Push nasceu desabilitado — é o conserto exagerado, que tira " +
+          "o aviso com a aba aberta junto",
+      ).toBe(false);
+    } finally {
+      if (oldVapid !== undefined) {
+        process.env.VAPID_PUBLIC_KEY = oldVapid;
+      }
+    }
   });
 });

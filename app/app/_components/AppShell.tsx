@@ -6,6 +6,8 @@ import { BarraDeProgressoNavegacao } from "@/components/shell/BarraDeProgressoNa
 import { useInboundMessageAlerts } from "@/hooks/notifications/useInboundMessageAlerts";
 import { useCrmAlerts } from "@/hooks/notifications/useCrmAlerts";
 import { useNotifyOpenFromServiceWorker } from "@/lib/notifications/notify_open";
+import { useNewMessageSound } from "@/hooks/inbox/useNewMessageSound";
+import { useActiveOrg } from "@/hooks/auth/AuthProvider";
 
 interface AppShellProps {
   sidebarCollapsed: boolean;
@@ -13,6 +15,8 @@ interface AppShellProps {
 }
 
 export function AppShell({ sidebarCollapsed, children }: AppShellProps) {
+  const activeOrg = useActiveOrg();
+  useNewMessageSound(activeOrg?.orgId ?? null);
   useInboundMessageAlerts();
   useCrmAlerts();
   useNotifyOpenFromServiceWorker();

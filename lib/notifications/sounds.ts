@@ -9,7 +9,7 @@ const PICO = 0.3;
 
 let ctx: AudioContext | null = null;
 
-function getContext(): AudioContext | null {
+export function getContext(): AudioContext | null {
   if (typeof window === "undefined") return null;
   const Ctor = window.AudioContext ?? (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
   if (!Ctor) return null;
