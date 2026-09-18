@@ -41,6 +41,9 @@
     "node_modules",
     ".next",
     "dist",
-    "scripts/**"
+    "scripts/**",
+    "tests/**",
+    "**/*.test.ts",
+    "**/*.test.tsx"
   ]
 }
