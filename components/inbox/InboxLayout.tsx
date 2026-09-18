@@ -208,8 +208,8 @@ export function InboxLayout({ initialSelectedId = null }: InboxLayoutProps = {})
   // Source it from the same query the list uses to avoid an extra request.
   const listQ = useConversationsRealtime(filters, orgId);
   const inList = useMemo(() => {
-    const all = listQ.data?.pages.flatMap((p: any) => p.data) ?? [];
-    return all.find((c: any) => c.id === selectedId) ?? null;
+    const all = listQ.data?.pages.flatMap((p) => p.data) ?? [];
+    return all.find((c) => c.id === selectedId) ?? null;
   }, [listQ.data, selectedId]);
 
   // Deep-link para conversa fora do filtro atual (ou fora do escopo do agent):

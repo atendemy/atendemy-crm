@@ -17,6 +17,7 @@ export function useNewMessageSound(orgId: string | null) {
           filter: `organization_id=eq.${orgId}`,
         }
       : undefined,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onChange: (payload: any) => {
       if (!payload.new || !payload.new.id) return;
       
