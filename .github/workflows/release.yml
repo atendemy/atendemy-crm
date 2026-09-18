@@ -20,8 +20,8 @@ name: release
 
 on:
   workflow_dispatch: {}
-  push:
-    branches: [main]
+  # push:
+  #   branches: [main]
 
 # O GITHUB_TOKEN aqui só clona e lê. Todo escopo de escrita vem do App, o que
 # mantém `tests/unit/workflows-tem-permissions.test.ts` sem entrada nova.
@@ -87,7 +87,7 @@ jobs:
             --title "Release ${VERSAO}" --body-file /tmp/corpo.md
 
   cortar-tag:
-    if: github.event_name == 'push' && secrets.RELEASE_APP_ID != ''
+    if: github.event_name == 'push'
     runs-on: ubuntu-latest
     permissions:
       contents: read
