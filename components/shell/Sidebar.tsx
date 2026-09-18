@@ -256,6 +256,29 @@ export function SidebarContent({
                   {items.map((item) => {
                     const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
                     const Icon = item.icon;
+                    let iconColorClass = "text-muted-foreground";
+                    let iconBgClass = "bg-transparent";
+                    if (isActive) {
+                      switch (group.id) {
+                        case "atendimento": iconColorClass = "text-emerald-400"; iconBgClass = "bg-emerald-500/20 ring-1 ring-inset ring-emerald-500/30"; break;
+                        case "crm": iconColorClass = "text-purple-400"; iconBgClass = "bg-purple-500/20 ring-1 ring-inset ring-purple-500/30"; break;
+                        case "ia": iconColorClass = "text-cyan-400"; iconBgClass = "bg-cyan-500/20 ring-1 ring-inset ring-cyan-500/30"; break;
+                        case "canais": iconColorClass = "text-orange-400"; iconBgClass = "bg-orange-500/20 ring-1 ring-inset ring-orange-500/30"; break;
+                        case "analise": iconColorClass = "text-pink-400"; iconBgClass = "bg-pink-500/20 ring-1 ring-inset ring-pink-500/30"; break;
+                        case "organizacao": iconColorClass = "text-neutral-300"; iconBgClass = "bg-neutral-500/20 ring-1 ring-inset ring-neutral-500/30"; break;
+                        default: iconColorClass = "text-accent-foreground"; iconBgClass = "bg-accent/50 ring-1 ring-inset ring-accent";
+                      }
+                    } else {
+                      switch (group.id) {
+                        case "atendimento": iconColorClass = "text-emerald-500/70 group-hover:text-emerald-400"; break;
+                        case "crm": iconColorClass = "text-purple-500/70 group-hover:text-purple-400"; break;
+                        case "ia": iconColorClass = "text-cyan-500/70 group-hover:text-cyan-400"; break;
+                        case "canais": iconColorClass = "text-orange-500/70 group-hover:text-orange-400"; break;
+                        case "analise": iconColorClass = "text-pink-500/70 group-hover:text-pink-400"; break;
+                        case "organizacao": iconColorClass = "text-neutral-500/70 group-hover:text-neutral-400"; break;
+                      }
+                    }
+
                     return (
                       <li key={item.href}>
                         <Link
@@ -264,14 +287,16 @@ export function SidebarContent({
                           aria-current={isActive ? "page" : undefined}
                           onClick={onNavigate}
                           className={cn(
-                            "relative flex items-center gap-3 rounded-md px-3 py-1 text-sm transition-colors",
+                            "group relative flex items-center gap-3 rounded-md px-3 py-1 text-sm transition-colors",
                             isActive
-                              ? "bg-accent text-accent-foreground"
-                              : "text-muted-foreground hover:bg-accent/50 hover:text-foreground",
+                              ? "bg-accent/30 text-foreground font-medium"
+                              : "text-muted-foreground hover:bg-accent/20 hover:text-foreground",
                             collapsed && "justify-center px-2",
                           )}
                         >
-                          <Icon size={18} weight={isActive ? "fill" : "regular"} aria-hidden />
+                          <div className={cn("flex shrink-0 items-center justify-center rounded-md p-1 transition-colors", iconBgClass, iconColorClass)}>
+                            <Icon size={18} weight="duotone" aria-hidden />
+                          </div>
                           {!collapsed && <span className="truncate">{t(item.label)}</span>}
                           {item.healthDot && (
                             <ConnectionHealthDot
