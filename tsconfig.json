@@ -44,6 +44,12 @@
     "scripts/**",
     "tests/**",
     "**/*.test.ts",
-    "**/*.test.tsx"
+    "**/*.test.tsx",
+    "graphify-out",
+    "tests/e2e",
+    "tests/journeys",
+    "tests/invariants",
+    "tests/unit",
+    "hostgator-setup-kit"
   ]
 }

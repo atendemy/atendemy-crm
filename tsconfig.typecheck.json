@@ -24,5 +24,16 @@
     "tests/**/*.ts",
     "tests/**/*.tsx"
   ],
-  "exclude": ["node_modules", ".next", "dist", "scripts/**"]
+  "exclude": [
+    "node_modules",
+    ".next",
+    "dist",
+    "scripts/**",
+    "graphify-out",
+    "tests/e2e",
+    "tests/journeys",
+    "tests/invariants",
+    "tests/unit",
+    "hostgator-setup-kit"
+  ]
 }
