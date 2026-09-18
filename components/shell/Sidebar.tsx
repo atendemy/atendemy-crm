@@ -291,7 +291,7 @@ export function SidebarContent({
                             collapsed && "justify-center px-2",
                           )}
                         >
-                          <div className={cn("flex shrink-0 items-center justify-center rounded-md p-1 transition-colors", iconBgClass, iconColorClass)}>
+                          <div className={cn("flex shrink-0 items-center justify-center rounded-md p-0.5 -my-0.5 transition-colors", iconBgClass, iconColorClass)}>
                             <Icon size={18} weight="duotone" aria-hidden />
                           </div>
                           {!collapsed && <span className="truncate">{t(item.label)}</span>}
