@@ -13,6 +13,7 @@ import {
   type ConversationsFilters,
   type ConversationWithContact,
 } from "@/hooks/inbox/useConversationsRealtime";
+import { useNewMessageSound } from "@/hooks/inbox/useNewMessageSound";
 import { useConversation, isNotFound } from "@/hooks/inbox/useConversation";
 import { ConversationList } from "./ConversationList";
 import { InboxFilters, type InboxFiltersValue, type InboxTab } from "./InboxFilters";
@@ -118,6 +119,9 @@ export function InboxLayout({ initialSelectedId = null }: InboxLayoutProps = {})
   const t = useT();
   const { activeOrg, user } = useAuth();
   const supportReadonly = user.support?.access_mode === "support_readonly";
+  
+  // Toca um som suave quando uma nova mensagem chega na fila/painel
+  useNewMessageSound(activeOrg?.orgId ?? null);
   const orgId = activeOrg?.orgId ?? null;
 
   const router = useRouter();
